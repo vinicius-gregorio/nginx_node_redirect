@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+
+  nginx:
+    container_name: nginx
+    build:
+      context: ./nginx
+    networks:
+      - fullcycle
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+      - db
+    
+
+  app:
+    container_name: app
+    entrypoint:  dockerize -wait tcp://db:3306 -timeout 20s docker-entrypoint.sh
+    build:
+      context: ./node
+    networks:
+      - fullcycle
+    volumes:
+      - ./node:/usr/src/app
+    ports: 
+      - "3000:3000"
+    depends_on:
+      - db
+
+  db: 
+    build: 
+      context: ./mysql
+    container_name: db
+    restart: always
+    tty: true
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_DATABASE=nodedb
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - fullcycle
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  fullcycle: 
+    driver: bridge
+
+
+
+
