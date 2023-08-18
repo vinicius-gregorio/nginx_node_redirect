@@ -19,9 +19,10 @@ const showQuery = `SELECT * FROM person`;
 conn.query(sqlInsert);
 
 const people = conn.query(showQuery);
-console.log(people);
 conn.end();
 app.get("/", (req, res) => {
+  console.log(people);
+
   res.send("<h1>Docker Container</h1>");
 });
 

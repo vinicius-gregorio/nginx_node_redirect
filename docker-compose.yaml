@@ -3,7 +3,7 @@ version: '3'
 services:
 
   app:
-    entrypoint:  dockerize -wait tcp://db:3306 -timeout 20s docker-entrypoint.sh node index.js
+    entrypoint: dockerize -wait tcp://db:3306 -timeout 20s docker-entrypoint.sh sh -c "npm instal && node index.js"
     container_name: app
     build:
       context: ./node
@@ -23,8 +23,8 @@ services:
     restart: always
     tty: true
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./data:/docker-entrypoint-initdb.d
+      - ./data/entry.sql:/docker-entrypoint-initdb.d/entry.sql
+      - ./mysql_data:/var/lib/mysql
     environment:
       - MYSQL_DATABASE=nodedb
       - MYSQL_ROOT_PASSWORD=root
@@ -43,9 +43,6 @@ services:
       - app
      
 
-volumes:
-  mysql_data:
-    driver: local
 
 networks:
   fullcycle: 
